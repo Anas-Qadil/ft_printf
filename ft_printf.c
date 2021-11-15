@@ -6,34 +6,32 @@
 /*   By: aqadil <aqadil@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/13 17:26:24 by aqadil            #+#    #+#             */
-/*   Updated: 2021/11/14 05:40:57 by aqadil           ###   ########.fr       */
+/*   Updated: 2021/11/15 22:49:10 by aqadil           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-void ft_putchar(char c)
+void	ft_putchar(char c)
 {
 	write(1, &c, 1);
 }
-// hexxx
 
-// int count_hex(int nbr)
-// {
-// 	int i = 0;
-// 	while (nbr)
-// 	{
-// 		base[nbr % base_type];
-// 		i++;
-// 		nbr = nbr / base_type;
-// 	}
-// 	printf("%i", i);
-// }
+int	hex_len(unsigned long int num)
+{
+	int	i;
+
+	i = 0;
+	while (num != 0)
+	{
+		i++;
+		num = num / 16;
+	}
+	return (i);
+}
 
 void	base_converter(long nbr, int base_type, char *base)
 {
-
-
 	if (nbr < base_type)
 	{
 		ft_putchar(base[nbr % base_type]);
@@ -45,11 +43,43 @@ void	base_converter(long nbr, int base_type, char *base)
 	}
 }
 
-void	ft_putnbr_base(int nbr, char *base)
+int	ft_putnbr_base(unsigned int nbr, char *base)
 {
-	int		i;
-	int		base_type;
-	long	longnbr;
+	int	i;
+	int	base_type;
+
+	i = 0;
+	base_type = 16;
+	if (nbr < 0)
+	{
+		ft_putchar('-');
+		nbr = -nbr;
+	}
+	base_converter(nbr, base_type, base);
+	i = hex_len(nbr);
+	if (nbr == 0)
+		i = 1;
+	return (i);
+}
+
+void	base_converter_long(unsigned long int nbr, int base_type, char *base)
+{
+	if (nbr < base_type)
+	{
+		ft_putchar(base[nbr % base_type]);
+	}
+	else
+	{
+		base_converter_long(nbr / base_type, base_type, base);
+		base_converter_long(nbr % base_type, base_type, base);
+	}
+}
+
+int	ft_putnbr_base_long(unsigned long int nbr, char *base)
+{
+	int					i;
+	int					base_type;
+	unsigned long int	longnbr;
 
 	longnbr = nbr;
 	i = 0;
@@ -59,15 +89,13 @@ void	ft_putnbr_base(int nbr, char *base)
 		ft_putchar('-');
 		longnbr = -longnbr;
 	}
-	base_converter(longnbr, base_type, base);
-	//printf("%d", i);
+	base_converter_long(longnbr, base_type, base);
+	return (i);
 }
-
-// end hexx
 
 char	find_conversion(const char *format, int i)
 {
-	if (format[i+1] == 'c')
+	if (format[i + 1] == 'c')
 		return ('c');
 	if (format[i + 1] == 's')
 		return ('s');
@@ -85,21 +113,33 @@ char	find_conversion(const char *format, int i)
 		return ('X');
 	return (0);
 }
-// gheda bda hadi 
-void	hex_dec_print(va_list args)
-{
-	// i fucking don't know how to do it
-	void *c;
-	char tmp;
-	c = va_arg(args, void *);
-	write(1, "0x1", 3);
-}
-// katsali hna
 
-int nbr_size(nb)
+int	hex_dec_print(va_list args)
 {
-	int i = 0;
-	while (nb%10 != 0)
+	int					k;
+	void				*c;
+	char				tmp;
+	int					itarch;
+	unsigned long int	nb;
+
+	c = va_arg(args, void *);
+	write(1, "0x", 2);
+	nb = (unsigned long int)c;
+	k = ft_putnbr_base_long(nb, "0123456789abcdef");
+	itarch = hex_len(nb);
+	if (nb == 0)
+		itarch = 1;
+	return (itarch + 2);
+}
+
+long int	nbr_size(long int nb)
+{
+	int	i;
+
+	i = 0;
+	if (nb == 0)
+		return (1);
+	while (nb != 0)
 	{
 		i++;
 		nb = nb / 10;
@@ -109,12 +149,16 @@ int nbr_size(nb)
 
 int	ft_putnbr(int nb)
 {
-	int size = 0;
+	int	size;
+
+	size = 0;
 	if (nb < 0)
 	{
 		size++;
 		size = size + nbr_size(-nb);
-	}else{
+	}
+	else
+	{
 		size = size + nbr_size(nb);
 	}
 	if (nb == -2147483648)
@@ -136,10 +180,8 @@ int	ft_putnbr(int nb)
 	return (size);
 }
 
-int	print_unsigned_int(unsigned int nb)
+void	print_unsigned_int(unsigned int nb)
 {
-	int size = 0;
-	size = nbr_size(nb);
 	if (nb < 0)
 	{
 		ft_putchar('-');
@@ -151,22 +193,24 @@ int	print_unsigned_int(unsigned int nb)
 			ft_putnbr(nb / 10);
 		ft_putchar(48 + nb % 10);
 	}
-	return (size);
 }
 
-int	print_conversion(char	c_type, va_list args)
+int	print_conversion(char c_type, va_list args)
 {
-	char *c;
-	int nb;
-	unsigned int un;
-	int size = 0;
+	char			*c;
+	int				nb;
+	unsigned int	un;
+	int				size;
+	int 			k;
+
+	size = 0;
 	if (c_type == 'c')
 	{
 		c = va_arg(args, char *);
 		write(1, &c, 1);
 		return (1);
 	}
-	else if(c_type == 's')
+	else if (c_type == 's')
 	{
 		c = va_arg(args, char *);
 		if (!c)
@@ -182,7 +226,9 @@ int	print_conversion(char	c_type, va_list args)
 		return (size);
 	}
 	else if(c_type == 'p')
-		hex_dec_print(args);
+	{
+		return(hex_dec_print(args));
+	}
 	else if (c_type == 'i' || c_type == 'd')
 	{
 		nb = va_arg(args, int);
@@ -190,33 +236,37 @@ int	print_conversion(char	c_type, va_list args)
 	}
 	else if (c_type == 'u')
 	{
-		un = va_arg(args, int);
-		if (un < 0)
-			write(1, "4294967295", 10);
-		else
-			size = size + print_unsigned_int(un);
+		un = va_arg(args, unsigned int);
+		size = nbr_size(un);
+		print_unsigned_int(un);
 	}
 	else if (c_type == 'x')
 	{
-		ft_putnbr_base(250, "0123456789abcdef");
+		un = va_arg(args, int);
+		return(ft_putnbr_base(un, "0123456789abcdef"));
 	}
 	else if (c_type == 'X')
 	{
-		ft_putnbr_base(250, "0123456789ABCDEF");
+		un = va_arg(args, int);
+		if (un < 0)
+		{
+			un = 4294967295 + (un);
+		}
+		return(ft_putnbr_base(un, "0123456789ABCDEF"));
 	}
 	return (size);
 }
 
-int ft_printf(const char *format, ...)
+int	ft_printf(const char *format, ...)
 {
-	va_list args;
-	int done = 0;
-	char c_type;
-	int	counter;
-	
+	va_list	args;
+	int		done;
+	char	c_type;
+	int		counter;
+
+	done = 0;
 	counter = 0;
 	va_start(args, format);
-
 	while (format[counter])
 	{
 		if (format[counter] == '%')
@@ -239,44 +289,4 @@ int ft_printf(const char *format, ...)
 	}
 	va_end(args);
 	return (done);
-}
-
-
-int main(void)
-{
-
-	int n = 700;
-	ft_putnbr_base(n, "0123456789abcdef");
-	// char *str = 0;
-	// int c;
-	// int cft;
-	// cft = ft_printf("hellow %s\n", str);
-	// c = printf("hellow %s\n", str);
-	// printf("\n %d", cft);	
-	// printf("\n %d", c);	
-	//------------------------ CHAR TEST --------------------//
-	
-	// ft_printf("%c", '0');
-	// ft_printf(" %c ", '0');
-	// ft_printf(" %c", '0' - 256);
-	// ft_printf("%c ", '0' + 256);
-	// ft_printf(" %c %c %c ", '0', 0, '1');
-	// ft_printf(" %c %c %c ", ' ', ' ', ' ');
-	// ft_printf(" %c %c %c ", '1', '2', '3');
-	// ft_printf(" %c %c %c ", '2', '1', 0);
-	// ft_printf(" %c %c %c ", 0, '1', '2');
-
-	// printf("\n-------------------------------\n");
-	
-	// printf("%c", '0');
-	// printf(" %c ", '0');
-	// printf(" %c", '0' - 256);
-	// printf("%c ", '0' + 256);
-	// printf(" %c %c %c ", '0', 0, '1');
-	// printf(" %c %c %c ", ' ', ' ', ' ');
-	// printf(" %c %c %c ", '1', '2', '3');
-	// printf(" %c %c %c ", '2', '1', 0);
-	// printf(" %c %c %c ", 0, '1', '2');
-
-	//------------------------ CHAR TEST --------------------//
 }
