@@ -6,7 +6,7 @@
 /*   By: aqadil <aqadil@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/15 22:52:51 by aqadil            #+#    #+#             */
-/*   Updated: 2021/11/16 03:11:07 by aqadil           ###   ########.fr       */
+/*   Updated: 2021/11/16 04:17:54 by aqadil           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,6 @@ void	base_converter_long(unsigned long int nbr, char *base)
 	}
 }
 
-void	ft_putnbr_base_long(unsigned long int nbr, char *base)
-{
-	base_converter_long(nbr, base);
-}
-
 int	hex_dec_print(va_list args)
 {
 	void				*c;
@@ -52,7 +47,7 @@ int	hex_dec_print(va_list args)
 	c = va_arg(args, void *);
 	write(1, "0x", 2);
 	nb = (unsigned long int)c;
-	ft_putnbr_base_long(nb, "0123456789abcdef");
+	base_converter_long(nb, "0123456789abcdef");
 	size = hex_len(nb);
 	if (nb == 0)
 		size = 1;

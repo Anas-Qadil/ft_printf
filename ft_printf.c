@@ -6,7 +6,7 @@
 /*   By: aqadil <aqadil@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/13 17:26:24 by aqadil            #+#    #+#             */
-/*   Updated: 2021/11/16 03:48:51 by aqadil           ###   ########.fr       */
+/*   Updated: 2021/11/17 22:55:43 by aqadil           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,25 +43,21 @@ char	find_conversion(const char *format, int i)
 
 int	print_conversion(char c_type, va_list args)
 {
-	int	nb;
-	int	size;
-
-	size = 0;
 	if (c_type == 'c')
 		return (print_c_chars(args));
 	else if (c_type == 's')
 		return (print_s_chars(args));
-	else if (c_type == 'p')
-		return (hex_dec_print(args));
 	else if (c_type == 'i' || c_type == 'd')
 		return (printing_i_and_d(args));
 	else if (c_type == 'u')
 		return (print_unsigned_int(args));
 	else if (c_type == 'x' || c_type == 'X')
 		return (is_this_lower_x_or_upper_x(c_type, args));
+	else if (c_type == 'p')
+		return (hex_dec_print(args));
 	else if (c_type == '%')
 		return (print_percent());
-	return (size);
+	return (0);
 }
 
 int	ft_printf(const char *format, ...)
